@@ -1,12 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <h2 class="font-bold text-2xl text-slate-900 leading-tight">Perfil</h2>
+                <p class="text-sm text-slate-500 mt-1">Gerir dados pessoais, segurança e sessões da conta.</p>
+            </div>
+        </div>
     </x-slot>
 
-    <div>
-        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+    <div class="bg-slate-50/60 min-h-screen">
+        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8 space-y-8">
             @if (Laravel\Fortify\Features::canUpdateProfileInformation())
                 @livewire('profile.update-profile-information-form')
 
@@ -43,3 +46,6 @@
         </div>
     </div>
 </x-app-layout>
+
+
+

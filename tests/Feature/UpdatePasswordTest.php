@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Jetstream\Http\Livewire\UpdatePasswordForm;
@@ -48,3 +50,4 @@ test('new passwords must match', function () {
 
     expect(Hash::check('password', $user->fresh()->password))->toBeTrue();
 });
+

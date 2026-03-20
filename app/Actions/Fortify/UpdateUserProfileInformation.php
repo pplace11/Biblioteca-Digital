@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Actions\Fortify;
 
 use App\Models\User;
@@ -54,3 +56,6 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         $user->sendEmailVerificationNotification();
     }
 }
+
+
+

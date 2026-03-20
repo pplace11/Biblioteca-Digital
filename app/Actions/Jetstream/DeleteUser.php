@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Actions\Jetstream;
 
 use App\Models\User;
@@ -17,3 +19,6 @@ class DeleteUser implements DeletesUsers
         $user->delete();
     }
 }
+
+
+

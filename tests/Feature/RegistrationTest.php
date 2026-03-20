@@ -1,5 +1,7 @@
 <?php
 
+
+
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
 
@@ -33,3 +35,4 @@ test('new users can register', function () {
 })->skip(function () {
     return ! Features::enabled(Features::registration());
 }, 'Registration support is not enabled.');
+

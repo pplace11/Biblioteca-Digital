@@ -1,26 +1,29 @@
 <div>
-    <!-- Generate API Token -->
+    <!-- Gerar Token de API -->
+    {{-- Formulário inicial para criar novos tokens associados ao utilizador autenticado. --}}
     <x-form-section submit="createApiToken">
         <x-slot name="title">
-            {{ __('Create API Token') }}
+            {{ __('Criar Token de API') }}
         </x-slot>
 
         <x-slot name="description">
-            {{ __('API tokens allow third-party services to authenticate with our application on your behalf.') }}
+            {{ __('Os tokens de API permitem que servicos externos se autentiquem na aplicacao em seu nome.') }}
         </x-slot>
 
         <x-slot name="form">
-            <!-- Token Name -->
+            <!-- Nome do Token -->
+            {{-- Campo obrigatório para identificar o token na listagem. --}}
             <div class="col-span-6 sm:col-span-4">
-                <x-label for="name" value="{{ __('Token Name') }}" />
+                <x-label for="name" value="{{ __('Nome do Token') }}" />
                 <x-input id="name" type="text" class="mt-1 block w-full" wire:model="createApiTokenForm.name" autofocus />
                 <x-input-error for="name" class="mt-2" />
             </div>
 
-            <!-- Token Permissions -->
+            <!-- Permissoes do Token -->
             @if (Laravel\Jetstream\Jetstream::hasPermissions())
+                {{-- Permissões opcionais exibidas apenas quando Jetstream as tiver ativadas. --}}
                 <div class="col-span-6">
-                    <x-label for="permissions" value="{{ __('Permissions') }}" />
+                    <x-label for="permissions" value="{{ __('Permissoes') }}" />
 
                     <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                         @foreach (Laravel\Jetstream\Jetstream::$permissions as $permission)
@@ -36,11 +39,11 @@
 
         <x-slot name="actions">
             <x-action-message class="me-3" on="created">
-                {{ __('Created.') }}
+                {{ __('Criado.') }}
             </x-action-message>
 
             <x-button>
-                {{ __('Create') }}
+                {{ __('Criar') }}
             </x-button>
         </x-slot>
     </x-form-section>
@@ -48,19 +51,21 @@
     @if ($this->user->tokens->isNotEmpty())
         <x-section-border />
 
-        <!-- Manage API Tokens -->
+        <!-- Gerir Tokens de API -->
+        {{-- Secção de gestão para rever utilização, editar permissões e eliminar tokens. --}}
         <div class="mt-10 sm:mt-0">
             <x-action-section>
                 <x-slot name="title">
-                    {{ __('Manage API Tokens') }}
+                    {{ __('Gerir Tokens de API') }}
                 </x-slot>
 
                 <x-slot name="description">
-                    {{ __('You may delete any of your existing tokens if they are no longer needed.') }}
+                    {{ __('Pode eliminar qualquer token existente que ja nao seja necessario.') }}
                 </x-slot>
 
-                <!-- API Token List -->
+                <!-- Lista de Tokens de API -->
                 <x-slot name="content">
+                    {{-- Ordena tokens por nome para facilitar procura visual. --}}
                     <div class="space-y-6">
                         @foreach ($this->user->tokens->sortBy('name') as $token)
                             <div class="flex items-center justify-between">
@@ -71,18 +76,20 @@
                                 <div class="flex items-center ms-2">
                                     @if ($token->last_used_at)
                                         <div class="text-sm text-gray-400">
-                                            {{ __('Last used') }} {{ $token->last_used_at->diffForHumans() }}
+                                            {{ __('Ultima utilizacao') }} {{ $token->last_used_at->diffForHumans() }}
                                         </div>
                                     @endif
 
                                     @if (Laravel\Jetstream\Jetstream::hasPermissions())
+                                        {{-- Abre modal para ajustar permissões do token selecionado. --}}
                                         <button class="cursor-pointer ms-6 text-sm text-gray-400 underline" wire:click="manageApiTokenPermissions({{ $token->id }})">
-                                            {{ __('Permissions') }}
+                                            {{ __('Permissoes') }}
                                         </button>
                                     @endif
 
+                                    {{-- Solicita confirmação antes de eliminar definitivamente o token. --}}
                                     <button class="cursor-pointer ms-6 text-sm text-red-500" wire:click="confirmApiTokenDeletion({{ $token->id }})">
-                                        {{ __('Delete') }}
+                                        {{ __('Eliminar') }}
                                     </button>
                                 </div>
                             </div>
@@ -93,15 +100,16 @@
         </div>
     @endif
 
-    <!-- Token Value Modal -->
+    <!-- Modal de Valor do Token -->
+    {{-- Mostra o token gerado apenas uma vez para cópia segura. --}}
     <x-dialog-modal wire:model.live="displayingToken">
         <x-slot name="title">
-            {{ __('API Token') }}
+            {{ __('Token de API') }}
         </x-slot>
 
         <x-slot name="content">
             <div>
-                {{ __('Please copy your new API token. For your security, it won\'t be shown again.') }}
+                {{ __('Copie o seu novo token de API. Por seguranca, nao sera mostrado novamente.') }}
             </div>
 
             <x-input x-ref="plaintextToken" type="text" readonly :value="$plainTextToken"
@@ -113,15 +121,16 @@
 
         <x-slot name="footer">
             <x-secondary-button wire:click="$set('displayingToken', false)" wire:loading.attr="disabled">
-                {{ __('Close') }}
+                {{ __('Fechar') }}
             </x-secondary-button>
         </x-slot>
     </x-dialog-modal>
 
-    <!-- API Token Permissions Modal -->
+    <!-- Modal de Permissoes do Token de API -->
+    {{-- Modal para atualizar permissões de um token existente. --}}
     <x-dialog-modal wire:model.live="managingApiTokenPermissions">
         <x-slot name="title">
-            {{ __('API Token Permissions') }}
+            {{ __('Permissoes do Token de API') }}
         </x-slot>
 
         <x-slot name="content">
@@ -137,33 +146,37 @@
 
         <x-slot name="footer">
             <x-secondary-button wire:click="$set('managingApiTokenPermissions', false)" wire:loading.attr="disabled">
-                {{ __('Cancel') }}
+                {{ __('Cancelar') }}
             </x-secondary-button>
 
             <x-button class="ms-3" wire:click="updateApiToken" wire:loading.attr="disabled">
-                {{ __('Save') }}
+                {{ __('Guardar') }}
             </x-button>
         </x-slot>
     </x-dialog-modal>
 
-    <!-- Delete Token Confirmation Modal -->
+    <!-- Modal de Confirmacao para Eliminar Token -->
+    {{-- Confirmação final para prevenir remoção acidental de tokens. --}}
     <x-confirmation-modal wire:model.live="confirmingApiTokenDeletion">
         <x-slot name="title">
-            {{ __('Delete API Token') }}
+            {{ __('Eliminar Token de API') }}
         </x-slot>
 
         <x-slot name="content">
-            {{ __('Are you sure you would like to delete this API token?') }}
+            {{ __('Tem a certeza de que pretende eliminar este token de API?') }}
         </x-slot>
 
         <x-slot name="footer">
             <x-secondary-button wire:click="$toggle('confirmingApiTokenDeletion')" wire:loading.attr="disabled">
-                {{ __('Cancel') }}
+                {{ __('Cancelar') }}
             </x-secondary-button>
 
             <x-danger-button class="ms-3" wire:click="deleteApiToken" wire:loading.attr="disabled">
-                {{ __('Delete') }}
+                {{ __('Eliminar') }}
             </x-danger-button>
         </x-slot>
     </x-confirmation-modal>
 </div>
+
+
+

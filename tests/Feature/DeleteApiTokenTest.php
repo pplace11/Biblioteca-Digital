@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 use Illuminate\Support\Str;
 use Laravel\Jetstream\Features;
@@ -27,3 +29,4 @@ test('api tokens can be deleted', function () {
 })->skip(function () {
     return ! Features::hasApiFeatures();
 }, 'API support is not enabled.');
+

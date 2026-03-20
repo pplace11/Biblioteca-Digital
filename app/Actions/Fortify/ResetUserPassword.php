@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Actions\Fortify;
 
 use App\Models\User;
@@ -30,3 +32,6 @@ class ResetUserPassword implements ResetsUserPasswords
         ])->save();
     }
 }
+
+
+

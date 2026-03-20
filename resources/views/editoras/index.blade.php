@@ -1,138 +1,123 @@
 <x-app-layout>
-    {{-- Container principal da tela de listagem de editoras --}}
-    <div class="p-6">
-        {{-- Título da página --}}
-        <h1 class="text-3xl font-bold mb-6">
-            Editoras
-        </h1>
+    <div class="p-6 max-w-7xl mx-auto">
+        {{-- Verifica se o usuário autenticado é admin para liberar ações administrativas --}}
+        @php
+            $isAdmin = auth()->check() && auth()->user()->role == 'admin';
+        @endphp
 
-        {{-- Botão para criar uma nova editora --}}
-        <a href="{{ route('editoras.create') }}" class="btn btn-primary mb-4">
-            Nova Editora
-        </a>
-
-        {{-- Formulário de filtros: pesquisa por nome e ordenação --}}
-        <form method="GET" action="{{ route('editoras.index') }}" class="mb-6">
-            <div class="flex flex-col gap-3">
-                {{-- Linha de pesquisa por nome --}}
-                <div class="flex gap-2">
-                    <input
-                        type="text"
-                        name="search"
-                        placeholder="Pesquisar por nome..."
-                        value="{{ $search }}"
-                        class="input input-bordered flex-1"
-                    >
-                    <button type="submit" class="btn btn-info">
-                        Pesquisar
-                    </button>
-
-                    {{-- Mostra o botão de limpar quando houver termo de pesquisa ativo --}}
-                    @if($search)
-                        <a href="{{ route('editoras.index') }}" class="btn btn-outline">
-                            Limpar
-                        </a>
-                    @endif
-                </div>
-
-                {{-- Linha de ordenação alfabética --}}
-                <div class="flex gap-2">
-                    <div class="form-control flex-1">
-                        <label class="label">
-                            <span class="label-text">Ordem:</span>
-                        </label>
-                        {{-- Envia o formulário automaticamente ao alterar a ordem --}}
-                        <select name="sort_order" class="select select-bordered" onchange="this.form.submit()">
-                            <option value="asc" {{ $sortOrder === 'asc' ? 'selected' : '' }}>A-Z (Crescente ↑)</option>
-                            <option value="desc" {{ $sortOrder === 'desc' ? 'selected' : '' }}>Z-A (Decrescente ↓)</option>
-                        </select>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-8">
+            {{-- Cabeçalho da página de editoras --}}
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Editoras</h1>
+                <p class="text-gray-500 mt-1">Veja editoras, logótipos e os livros publicados por cada uma.</p>
+            </div>
+            {{-- Exibe a data atual formatada em português --}}
+                @auth
+                    <div class="text-sm text-gray-400">
+                        {{ now()->locale('pt_PT')->translatedFormat('d \\d\\e F \\d\\e Y') }}
                     </div>
+                @endauth
+        </div>
 
-                    {{-- Exibe limpar para restaurar ordenação padrão quando necessário --}}
-                    @if($sortOrder !== 'asc')
-                        <div class="flex items-end">
-                            <a href="{{ route('editoras.index') }}" class="btn btn-sm btn-outline">
-                                Limpar
-                            </a>
-                        </div>
-                    @endif
+        {{-- Botão para criar nova editora, visível apenas para admin --}}
+        @if ($isAdmin)
+            <div class="mb-6">
+                <a href="{{ route('editoras.create') }}" class="btn bg-black text-white border-black hover:bg-gray-900 hover:text-white">Nova Editora</a>
+            </div>
+        @endif
+
+        {{-- Filtros de pesquisa e ordenação de editoras --}}
+        <form method="GET" action="{{ route('editoras.index') }}" class="mb-6 p-4 rounded-xl border border-gray-100 bg-gray-50/60">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div class="md:col-span-3">
+                    <label class="block text-xs uppercase tracking-wide text-gray-500 mb-1">Pesquisa</label>
+                    <input type="text" name="search" placeholder="Pesquisar por nome da editora" value="{{ $search }}" class="input input-bordered w-full bg-white">
                 </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wide text-gray-500 mb-1">Ordem</label>
+                    <select name="sort_order" class="select select-bordered w-full bg-white">
+                        <option value="asc" {{ $sortOrder === 'asc' ? 'selected' : '' }}>A-Z (Crescente ↑)</option>
+                        <option value="desc" {{ $sortOrder === 'desc' ? 'selected' : '' }}>Z-A (Decrescente ↓)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-2">
+                <button type="submit" class="btn bg-black text-white border-black hover:bg-gray-900 hover:text-white">Aplicar filtros</button>
+                <a href="{{ route('editoras.index') }}" class="btn btn-outline">Limpar</a>
             </div>
         </form>
 
-        {{-- Exibe tabela apenas quando houver editoras cadastradas --}}
-        @if($editoras->count() > 0)
-        <table class="table w-full">
-            <thead>
-                <tr>
-                    <th>Logótipo</th>
-                    <th>Nome</th>
-                    <th>Livros publicados</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{-- Percorre a lista de editoras para montar cada linha da tabela --}}
-                @foreach ($editoras as $editora)
-                    <tr>
-                        {{-- Coluna do logótipo da editora --}}
-                        <td>
-                            @if ($editora->logotipo)
-                                <img src="{{ asset($editora->logotipo) }}" class="w-16 h-16 object-contain">
-                            @endif
-                        </td>
-
-                        {{-- Nome com link para página de detalhes da editora --}}
-                        <td>
-                            <a href="{{ route('editoras.show', $editora->id) }}" class="font-bold hover:underline">
-                                {{ $editora->nome }}
-                            </a>
-                        </td>
-
-                        {{-- Lista de livros publicados vinculados à editora --}}
-                        <td>
-                            @if ($editora->livros->count() > 0)
-                                <div class="flex flex-wrap items-center gap-x-1 max-w-xl">
-                                    @foreach ($editora->livros as $livro)
-                                        {{-- Adiciona separador entre os nomes dos livros --}}
-                                        @if (!$loop->first)
-                                            <span class="text-gray-400 select-none">|</span>
+        {{-- Exibe a tabela de editoras se houver resultados --}}
+        @if ($editoras->count() > 0)
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="overflow-x-auto">
+                    <table class="table w-full text-sm">
+                        <thead>
+                            {{-- Cabeçalho da tabela de editoras --}}
+                            <tr class="text-gray-400 text-xs uppercase tracking-wide border-b border-gray-100">
+                                <th class="pb-3 font-medium text-left">Logótipo</th>
+                                <th class="pb-3 font-medium text-left">Editora</th>
+                                <th class="pb-3 font-medium text-left">Livros publicados</th>
+                                @if ($isAdmin)
+                                    <th class="pb-3 font-medium text-left">Ação</th>
+                                @endif
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            {{-- Itera sobre cada editora e exibe suas informações --}}
+                            @foreach ($editoras as $editora)
+                                <tr class="hover:bg-gray-50 transition">
+                                    {{-- Logotipo da editora ou inicial do nome se não houver logotipo --}}
+                                    <td class="py-3">
+                                        @if ($editora->logotipo)
+                                            <img src="{{ asset($editora->logotipo) }}" class="w-14 h-14 object-contain rounded border border-gray-200 bg-white p-1">
+                                        @else
+                                            <div class="w-14 h-14 rounded bg-gray-100 flex items-center justify-center text-gray-500 font-semibold">
+                                                {{ strtoupper(substr($editora->nome, 0, 1)) }}
+                                            </div>
                                         @endif
-                                        <a href="{{ route('livros.show', $livro->id) }}"
-                                            class="text-sm text-gray-800 hover:underline">
-                                            {{ $livro->nome }}
-                                        </a>
-                                    @endforeach
-                                </div>
-                            @else
-                                <span class="text-sm text-gray-500">Sem livros vinculados</span>
-                            @endif
-                        </td>
-
-                        {{-- Ações disponíveis para a editora atual --}}
-                        <td>
-                            <a href="{{ route('editoras.edit', $editora->id) }}" class="btn btn-primary btn-sm">
-                                Editar
-                            </a>
-
-                            {{-- Formulário para apagar a editora --}}
-                            <form action="{{ route('editoras.destroy', $editora->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-error btn-sm">
-                                    Apagar
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                                    </td>
+                                    {{-- Nome da editora e quantidade de livros publicados --}}
+                                    <td class="py-3">
+                                        <a href="{{ route('editoras.show', $editora->id) }}" class="font-semibold text-gray-900 hover:underline">{{ $editora->nome }}</a>
+                                        <p class="text-xs text-gray-400 mt-1">{{ $editora->livros->count() }} livro(s) publicado(s)</p>
+                                    </td>
+                                    {{-- Lista até 4 livros publicados, com link, e indica se há mais --}}
+                                    <td class="py-3 text-gray-700">
+                                        @if ($editora->livros->count() > 0)
+                                            @foreach ($editora->livros->take(4) as $livro)
+                                                @if (!$loop->first)
+                                                    <span class="text-gray-300">|</span>
+                                                @endif
+                                                <a href="{{ route('livros.show', $livro->id) }}" class="hover:underline">{{ $livro->nome }}</a>
+                                            @endforeach
+                                            @if ($editora->livros->count() > 4)
+                                                <span class="text-xs text-gray-400">+{{ $editora->livros->count() - 4 }}</span>
+                                            @endif
+                                        @else
+                                            <span class="text-gray-400">Sem livros vinculados</span>
+                                        @endif
+                                    </td>
+                                    {{-- Ações administrativas: editar editora (apenas para admin) --}}
+                                    @if ($isAdmin)
+                                        <td class="py-3">
+                                            <a href="{{ route('editoras.edit', $editora->id) }}" class="btn btn-sm btn-outline">Editar</a>
+                                        </td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {{-- Caso não haja editoras, exibe mensagem amigável --}}
         @else
-            {{-- Estado vazio quando não há editoras para os filtros aplicados --}}
-            <div class="text-center py-8">
+            <div class="text-center py-8 bg-white rounded-xl border border-gray-100">
                 <p class="text-gray-500 text-lg">Nenhuma editora encontrada.</p>
             </div>
         @endif
     </div>
 </x-app-layout>
+
+
+

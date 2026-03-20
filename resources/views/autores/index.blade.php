@@ -1,134 +1,123 @@
 <x-app-layout>
-    {{-- Container principal da listagem de autores --}}
-    <div class="p-6">
-        {{-- Título da página --}}
-        <h1 class="text-3xl font-bold mb-6">
-            Autores
-        </h1>
+    <div class="p-6 max-w-7xl mx-auto">
+        {{-- Verifica se o usuário autenticado é admin para liberar ações administrativas --}}
+        @php
+            $isAdmin = auth()->check() && auth()->user()->role == 'admin';
+        @endphp
 
-        {{-- Ação para abrir o formulário de cadastro de um novo autor --}}
-        <a href="{{ route('autores.create') }}" class="btn btn-primary mb-4">
-            Novo Autor
-        </a>
-
-        {{-- Formulário de filtros: pesquisa por nome e ordenação --}}
-        <form method="GET" action="{{ route('autores.index') }}" class="mb-6">
-            <div class="flex flex-col gap-3">
-                {{-- Linha de busca por nome --}}
-                <div class="flex gap-2">
-                    <input type="text" name="search" placeholder="Pesquisar por nome..." value="{{ $search }}"
-                        class="input input-bordered flex-1">
-                    <button type="submit" class="btn btn-info">
-                        Pesquisar
-                    </button>
-
-                    {{-- Exibe botão para limpar o termo de pesquisa quando houver filtro ativo --}}
-                    @if ($search)
-                        <a href="{{ route('autores.index') }}" class="btn btn-outline">
-                            Limpar
-                        </a>
-                    @endif
-                </div>
-
-                {{-- Linha de ordenação alfabética --}}
-                <div class="flex gap-2">
-                    <div class="form-control flex-1">
-                        <label class="label">
-                            <span class="label-text">Ordem:</span>
-                        </label>
-                        {{-- Envia automaticamente o formulário ao mudar a ordem --}}
-                        <select name="sort_order" class="select select-bordered" onchange="this.form.submit()">
-                            <option value="asc" {{ $sortOrder === 'asc' ? 'selected' : '' }}>A-Z (Crescente ↑)
-                            </option>
-                            <option value="desc" {{ $sortOrder === 'desc' ? 'selected' : '' }}>Z-A (Decrescente ↓)
-                            </option>
-                        </select>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-8">
+            {{-- Cabeçalho da página de autores --}}
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Autores</h1>
+                <p class="text-gray-500 mt-1">Explore autores, biografias e obras associadas.</p>
+            </div>
+                @auth
+                    {{-- Exibe a data atual formatada em português --}}
+                    <div class="text-sm text-gray-400">
+                        {{ now()->locale('pt_PT')->translatedFormat('d \\d\\e F \\d\\e Y') }}
                     </div>
+                @endauth
+        </div>
 
-                    {{-- Exibe botão para remover ordenação personalizada quando diferente do padrão --}}
-                    @if ($sortOrder !== 'asc')
-                        <div class="flex items-end">
-                            <a href="{{ route('autores.index') }}" class="btn btn-sm btn-outline">
-                                Limpar
-                            </a>
-                        </div>
-                    @endif
+        {{-- Botão para criar novo autor, visível apenas para admin --}}
+        @if ($isAdmin)
+            <div class="mb-6">
+                <a href="{{ route('autores.create') }}" class="btn bg-black text-white border-black hover:bg-gray-900 hover:text-white">Novo Autor</a>
+            </div>
+        @endif
+
+        {{-- Filtros de pesquisa e ordenação de autores --}}
+        <form method="GET" action="{{ route('autores.index') }}" class="mb-6 p-4 rounded-xl border border-gray-100 bg-gray-50/60">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div class="md:col-span-3">
+                    <label class="block text-xs uppercase tracking-wide text-gray-500 mb-1">Pesquisa</label>
+                    <input type="text" name="search" placeholder="Pesquisar por nome do autor" value="{{ $search }}" class="input input-bordered w-full bg-white">
                 </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wide text-gray-500 mb-1">Ordem</label>
+                    <select name="sort_order" class="select select-bordered w-full bg-white">
+                        <option value="asc" {{ $sortOrder === 'asc' ? 'selected' : '' }}>A-Z (Crescente ↑)</option>
+                        <option value="desc" {{ $sortOrder === 'desc' ? 'selected' : '' }}>Z-A (Decrescente ↓)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-2">
+                <button type="submit" class="btn bg-black text-white border-black hover:bg-gray-900 hover:text-white">Aplicar filtros</button>
+                <a href="{{ route('autores.index') }}" class="btn btn-outline">Limpar</a>
             </div>
         </form>
 
-        {{-- Mostra a tabela somente se houver autores cadastrados --}}
+        {{-- Exibe a tabela de autores se houver resultados --}}
         @if ($autores->count() > 0)
-            <table class="table w-full">
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Nome</th>
-                        <th>Livros escritos</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{-- Percorre a coleção de autores para montar as linhas da tabela --}}
-                    @foreach ($autores as $autor)
-                        <tr>
-                            {{-- Foto do autor --}}
-                            <td>
-                                <img src="{{ asset($autor->foto) }}" class="w-16 h-16 rounded-full object-cover">
-                            </td>
-
-                            {{-- Nome com link para página de detalhes do autor --}}
-                            <td>
-                                <a href="{{ route('autores.show', $autor->id) }}" class="font-bold hover:underline">
-                                    {{ $autor->nome }}
-                                </a>
-                            </td>
-
-                            {{-- Lista os livros vinculados ao autor; caso contrário, mostra mensagem padrão --}}
-                            <td>
-                                @if ($autor->livros->count() > 0)
-                                    <div class="flex flex-wrap items-center gap-x-1 max-w-xl">
-                                        @foreach ($autor->livros as $livro)
-                                            {{-- Adiciona separador entre os livros, exceto antes do primeiro item --}}
-                                            @if (!$loop->first)
-                                                <span class="text-gray-400 select-none">|</span>
-                                            @endif
-                                            <a href="{{ route('livros.show', $livro->id) }}"
-                                                class="text-sm text-gray-800 hover:underline">
-                                                {{ $livro->nome }}
-                                            </a>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <span class="text-sm text-gray-500">Sem livros vinculados</span>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="overflow-x-auto">
+                    <table class="table w-full text-sm">
+                        <thead>
+                            {{-- Cabeçalho da tabela de autores --}}
+                            <tr class="text-gray-400 text-xs uppercase tracking-wide border-b border-gray-100">
+                                <th class="pb-3 font-medium text-left">Foto</th>
+                                <th class="pb-3 font-medium text-left">Autor</th>
+                                <th class="pb-3 font-medium text-left">Livros</th>
+                                @if ($isAdmin)
+                                    <th class="pb-3 font-medium text-left">Ação</th>
                                 @endif
-                            </td>
-
-                            {{-- Ações disponíveis para cada autor --}}
-                            <td>
-                                <a href="{{ route('autores.edit', $autor->id) }}" class="btn btn-primary btn-sm">
-                                    Editar
-                                </a>
-
-                                {{-- Formulário para exclusão do autor --}}
-                                <form action="{{ route('autores.destroy', $autor->id) }}" method="POST"
-                                    class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-error btn-sm">
-                                        Apagar
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            {{-- Itera sobre cada autor e exibe suas informações --}}
+                            @foreach ($autores as $autor)
+                                <tr class="hover:bg-gray-50 transition">
+                                    {{-- Foto do autor ou inicial do nome se não houver foto --}}
+                                    <td class="py-3">
+                                        @if ($autor->foto)
+                                            <img src="{{ asset($autor->foto) }}" class="w-12 h-12 rounded-full object-cover border border-gray-200">
+                                        @else
+                                            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-semibold">
+                                                {{ strtoupper(substr($autor->nome, 0, 1)) }}
+                                            </div>
+                                        @endif
+                                    </td>
+                                    {{-- Nome do autor e quantidade de livros associados --}}
+                                    <td class="py-3">
+                                        <a href="{{ route('autores.show', $autor->id) }}" class="font-semibold text-gray-900 hover:underline">{{ $autor->nome }}</a>
+                                        <p class="text-xs text-gray-400 mt-1">{{ $autor->livros->count() }} livro(s) associado(s)</p>
+                                    </td>
+                                    {{-- Lista até 4 livros do autor, com link, e indica se há mais --}}
+                                    <td class="py-3 text-gray-700">
+                                        @if ($autor->livros->count() > 0)
+                                            @foreach ($autor->livros->take(4) as $livro)
+                                                @if (!$loop->first)
+                                                    <span class="text-gray-300">|</span>
+                                                @endif
+                                                <a href="{{ route('livros.show', $livro->id) }}" class="hover:underline">{{ $livro->nome }}</a>
+                                            @endforeach
+                                            @if ($autor->livros->count() > 4)
+                                                <span class="text-xs text-gray-400">+{{ $autor->livros->count() - 4 }}</span>
+                                            @endif
+                                        @else
+                                            <span class="text-gray-400">Sem livros vinculados</span>
+                                        @endif
+                                    </td>
+                                    {{-- Ações administrativas: editar autor (apenas para admin) --}}
+                                    @if ($isAdmin)
+                                        <td class="py-3">
+                                            <a href="{{ route('autores.edit', $autor->id) }}" class="btn btn-sm btn-outline">Editar</a>
+                                        </td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {{-- Caso não haja autores, exibe mensagem amigável --}}
         @else
-            {{-- Estado vazio quando não há resultados para os filtros atuais --}}
-            <div class="text-center py-8">
+            <div class="text-center py-8 bg-white rounded-xl border border-gray-100">
                 <p class="text-gray-500 text-lg">Nenhum autor encontrado.</p>
             </div>
         @endif
     </div>
 </x-app-layout>
+
+
+

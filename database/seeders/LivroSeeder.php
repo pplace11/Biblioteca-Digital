@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -283,4 +285,7 @@ class LivroSeeder extends Seeder
         $livro27->autores()->attach(11);
     }
 }
+
+
+
 

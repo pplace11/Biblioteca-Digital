@@ -1,1 +1,4 @@
 <x-application-logo {{ $attributes }} />
+
+
+

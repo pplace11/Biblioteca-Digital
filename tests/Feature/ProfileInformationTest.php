@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 use Laravel\Jetstream\Http\Livewire\UpdateProfileInformationForm;
 use Livewire\Livewire;
@@ -24,3 +26,4 @@ test('profile information can be updated', function () {
         ->name->toEqual('Test Name')
         ->email->toEqual('test@example.com');
 });
+

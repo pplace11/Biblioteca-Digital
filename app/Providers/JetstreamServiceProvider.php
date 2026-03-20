@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Providers;
 
 use App\Actions\Jetstream\DeleteUser;
@@ -44,3 +46,6 @@ class JetstreamServiceProvider extends ServiceProvider
         ]);
     }
 }
+
+
+

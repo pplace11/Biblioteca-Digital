@@ -25,3 +25,6 @@
         {{ $footer }}
     </div>
 </x-modal>
+
+
+

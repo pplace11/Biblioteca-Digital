@@ -1,17 +1,17 @@
 <?php
 
+
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Editora;
 use Illuminate\Database\Seeder;
 
+// Seeder que insere editoras padrao com o respetivo caminho de logotipo para desenvolvimento.
 class EditoraSeeder extends Seeder
 {
-    /**
-     * Executa a carga inicial de editoras.
-     */
-    // Insere editoras padrao com caminho de logotipo.
+    /** Executa a carga inicial de editoras. */
     public function run()
     {
         Editora::create([
@@ -48,3 +48,6 @@ class EditoraSeeder extends Seeder
         ]);
     }
 }
+
+
+

@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Exports;
 
 use App\Models\Livro;
@@ -14,3 +16,5 @@ class LivrosExport implements FromCollection
         return Livro::all();
     }
 }
+
+

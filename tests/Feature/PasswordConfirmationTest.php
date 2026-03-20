@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 use Laravel\Jetstream\Features;
 
@@ -33,3 +35,4 @@ test('password is not confirmed with invalid password', function () {
 
     $response->assertSessionHasErrors();
 });
+

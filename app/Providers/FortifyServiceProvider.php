@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
@@ -46,3 +48,6 @@ class FortifyServiceProvider extends ServiceProvider
         });
     }
 }
+
+
+

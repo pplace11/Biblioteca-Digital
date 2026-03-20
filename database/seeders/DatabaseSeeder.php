@@ -1,30 +1,37 @@
 <?php
 
+
+
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
 
 // Seeder principal que orquestra a carga de dados iniciais.
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-        * Executa os seeders da aplicacao.
+     * Executa os seeders da aplicacao.
      */
     public function run(): void
     {
         $this->call([
-        AutorSeeder::class,
-        EditoraSeeder::class,
-        LivroSeeder::class
+            AutorSeeder::class,
+            EditoraSeeder::class,
+            LivroSeeder::class
         ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        User::create([
+            'name' => 'Pedro Santos',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'numero_leitor_seq' => 1,
+            'numero_leitor' => 'L000001',
         ]);
     }
 }
+
+
+

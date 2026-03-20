@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Autor;
 use Illuminate\Http\Request;
 
-// Controller responsavel pelas operacoes CRUD de autores.
+// Controlador responsavel pelas operacoes CRUD de autores.
 class AutorController extends Controller
 {
     // Lista autores com pesquisa e ordenacao por nome.
@@ -77,7 +76,7 @@ class AutorController extends Controller
         }
 
         $autor->update($data);
-        return redirect()->route('autores.index');
+        return redirect()->route('autores.show', $autor->id);
     }
 
     // Remove os vinculos com livros antes de excluir o autor.
@@ -88,3 +87,6 @@ class AutorController extends Controller
         return redirect()->route('autores.index');
     }
 }
+
+
+

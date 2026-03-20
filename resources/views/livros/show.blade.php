@@ -1,4 +1,32 @@
 <x-app-layout>
+    {{-- Popup de sucesso exibido quando há mensagem de sucesso na sessão --}}
+    @if (session('popup_success'))
+        <div id="livro-popup-success" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/45"></div>
+            <div class="relative w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
+                <h3 class="text-lg font-bold text-gray-900">Sucesso</h3>
+                <p class="mt-2 text-sm text-gray-600">{{ session('popup_success') }}</p>
+                <div class="mt-5 flex justify-end">
+                    <button type="button" id="livro-popup-success-close" class="btn btn-outline">OK</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Popup de aviso exibido quando há mensagem de informação na sessão --}}
+    @if (session('popup_info'))
+        <div id="livro-popup-info" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/45"></div>
+            <div class="relative w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
+                <h3 class="text-lg font-bold text-gray-900">Aviso</h3>
+                <p class="mt-2 text-sm text-gray-600">{{ session('popup_info') }}</p>
+                <div class="mt-5 flex justify-end">
+                    <button type="button" id="livro-popup-info-close" class="btn btn-outline">OK</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- Container principal da página de detalhes do livro --}}
     <div class="p-6 max-w-5xl mx-auto">
         {{-- Botão para voltar à listagem de livros --}}
@@ -11,7 +39,7 @@
             <h1 class="text-3xl font-bold">{{ $livro->nome }}</h1>
         </div>
 
-        {{-- Card com dados principais do livro --}}
+        {{-- Card com dados principais do livro: capa, metadados e ações --}}
         <div class="card bg-base-100 shadow mb-8">
             <div class="card-body grid grid-cols-1 md:grid-cols-3 gap-6">
                 {{-- Coluna da capa (ou placeholder quando não existir imagem) --}}
@@ -27,14 +55,60 @@
                     @endif
                 </div>
 
-                {{-- Coluna com metadados do livro --}}
-                <div class="md:col-span-2 space-y-2">
-                    <p><span class="font-semibold">Editora:</span> {{ $livro->editora?->nome ?? 'Sem editora' }}</p>
-                    <p><span class="font-semibold">ISBN:</span> {{ $livro->isbn }}</p>
-                    <p><span class="font-semibold">Preco:</span> EUR {{ number_format($livro->preco, 2, ',', '.') }}</p>
-                    <div>
-                        <p class="font-semibold mb-1">Bibliografia</p>
-                        <p class="text-sm leading-relaxed">{{ $livro->bibliografia }}</p>
+                {{-- Coluna com metadados do livro: editora, ISBN, bibliografia, preço --}}
+                <div class="md:col-span-2 flex flex-col h-full">
+                    <div class="space-y-2">
+                        <p><span class="font-semibold">Editora:</span> {{ $livro->editora?->nome ?? 'Sem editora' }}</p>
+                        <p><span class="font-semibold">ISBN:</span> {{ $livro->isbn }}</p>
+                        <p><span class="font-semibold">Bibliografia:</span> <span class="text-sm leading-relaxed">{{ $livro->bibliografia }}</span></p>
+                        <p><span class="font-semibold">Preço:</span>
+                            @if (!is_null($livro->preco))
+                                {{ number_format((float) $livro->preco, 2, ',', '.') }} &euro;
+                            @else
+                                -
+                            @endif
+                        </p>
+                    </div>
+
+                    {{-- Bloco de ações: requisitar, solicitar devolução, editar (admin) ou login --}}
+                    <div class="mt-auto pt-6 flex justify-end">
+                        @if (auth()->check())
+                            <div class="flex items-center gap-2">
+                                @if (!empty($livroIndisponivel))
+                                    <span class="badge badge-success badge-outline">Requisitado</span>
+                                    @if (!empty($requisitadoPorMim))
+                                        @if ($minhaRequisicaoAtiva && $minhaRequisicaoAtiva->devolucao_solicitada_em)
+                                            <span class="badge border-amber-500 text-amber-700 bg-amber-50">Devolução em validação</span>
+                                        @else
+                                            <form action="{{ route('livros.cancelar-requisicao', $livro->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-outline btn-error">
+                                                    Solicitar devolução
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endif
+                                @else
+                                    <form action="{{ route('livros.requisitar', $livro->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn bg-black text-white border-black hover:bg-gray-900 hover:text-white">
+                                            Requisitar
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (auth()->user()->role === 'admin')
+                                    <a href="{{ route('livros.edit', $livro->id) }}" class="btn btn-sm btn-outline">
+                                        Editar
+                                    </a>
+                                @endif
+                            </div>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-outline">
+                                Entrar para requisitar
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -43,7 +117,7 @@
         {{-- Seção inferior com relacionamentos: autores e editora --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-                <h2 class="text-2xl font-semibold mb-4">Autor</h2>
+                <h2 class="text-2xl font-semibold mb-4">Autores</h2>
 
                 {{-- Lista de autores vinculados ao livro --}}
                 @if ($livro->autores->count() > 0)
@@ -71,7 +145,7 @@
                 @else
                     {{-- Estado vazio quando não há autores vinculados --}}
                     <div class="alert">
-                        <span>Este livro ainda nao possui autores vinculados.</span>
+                        <span>Este livro ainda não possui autores vinculados.</span>
                     </div>
                 @endif
             </div>
@@ -105,5 +179,178 @@
                 @endif
             </div>
         </div>
+
+        {{-- Seção de histórico de requisições do livro --}}
+        @auth
+        <div class="mt-10">
+            <h2 class="text-2xl font-semibold mb-4">Histórico</h2>
+
+            @if ($historicoRequisicoesPorCidadao->isNotEmpty())
+                <div class="space-y-4">
+                    @foreach ($historicoRequisicoesPorCidadao as $requisicoesDoCidadao)
+                        @php
+                            $cidadao = $requisicoesDoCidadao->first()?->user;
+                        @endphp
+                        {{-- Card de histórico de requisições por cidadão --}}
+                        <div class="card bg-base-100 shadow">
+                            <div class="card-body p-4">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <img src="{{ $requisicoesDoCidadao->first()?->cidadao_foto_url }}" alt="{{ $requisicoesDoCidadao->first()?->cidadao_nome ?? $cidadao?->name ?? 'Cidadão' }}" class="w-14 h-14 rounded-full object-cover border border-base-300 shrink-0">
+                                        <div>
+                                            <p class="font-semibold text-lg">{{ $requisicoesDoCidadao->first()?->cidadao_nome ?? $cidadao?->name ?? 'Cidadão removido' }}</p>
+                                            <p class="text-sm opacity-70">{{ $requisicoesDoCidadao->first()?->cidadao_email ?? $cidadao?->email ?? '-' }}</p>
+                                            <p class="text-sm opacity-70">N.º leitor: {{ $requisicoesDoCidadao->first()?->cidadao_numero_leitor ?? $cidadao?->numero_leitor ?? '-' }}</p>
+                                        </div>
+                                    </div>
+                                    <span class="badge badge-outline">
+                                        {{ $requisicoesDoCidadao->count() }} {{ $requisicoesDoCidadao->count() === 1 ? 'requisição' : 'requisições' }}
+                                    </span>
+                                </div>
+
+                                <div class="overflow-x-auto">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>N.º requisição</th>
+                                                <th>Estado</th>
+                                                <th>Data de requisição</th>
+                                                <th>Data prevista de fim</th>
+                                                <th>Dias decorridos</th>
+                                                <th>Data de encerramento</th>
+                                                @if (auth()->check() && auth()->user()->role === 'admin')
+                                                    <th>Ação</th>
+                                                @endif
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($requisicoesDoCidadao as $requisicao)
+                                                @php
+                                                    $dataEncerramento = $requisicao->data_recepcao_real ?? $requisicao->deleted_at;
+                                                    $diasDecorridos = $requisicao->dias_decorridos;
+
+                                                    if (is_null($diasDecorridos) && $dataEncerramento && $requisicao->created_at) {
+                                                        $diasDecorridos = (int) ceil(max(0, $requisicao->created_at->diffInHours($dataEncerramento) / 24));
+                                                    }
+
+                                                    $diasDecorridos = is_null($diasDecorridos) ? null : (int) $diasDecorridos;
+                                                @endphp
+                                                <tr>
+                                                    <td>{{ $requisicao->numero_requisicao ?? '-' }}</td>
+                                                    <td>
+                                                        @if (is_null($requisicao->deleted_at))
+                                                            @if ($requisicao->devolucao_solicitada_em)
+                                                                <span class="badge border-amber-500 text-amber-700 bg-amber-50 whitespace-nowrap">A confirmar</span>
+                                                            @else
+                                                                <span class="badge badge-success badge-outline whitespace-nowrap">Ativa</span>
+                                                            @endif
+                                                        @else
+                                                            <span class="badge border-red-500 text-red-600 bg-red-50 whitespace-nowrap">Encerrada</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $requisicao->created_at?->format('d/m/Y H:i') ?? '-' }}</td>
+                                                    <td>{{ $requisicao->data_fim_prevista?->format('d/m/Y H:i') ?? '-' }}</td>
+                                                    <td>{{ is_null($diasDecorridos) ? '-' : $diasDecorridos . ' ' . ($diasDecorridos === 1 ? 'dia' : 'dias') }}</td>
+                                                    <td>{{ $dataEncerramento?->format('d/m/Y H:i') ?? '-' }}</td>
+                                                    @if (auth()->check() && auth()->user()->role === 'admin')
+                                                        <td>
+                                                            @if (is_null($requisicao->deleted_at))
+                                                                @if (auth()->id() === $requisicao->user_id)
+                                                                    <span class="text-xs text-amber-600 font-medium whitespace-nowrap">Outro admin deve confirmar</span>
+                                                                @else
+                                                                    <form action="{{ route('requisicoes.confirmar-recepcao', $requisicao) }}" method="POST">
+                                                                        @csrf
+                                                                        <button type="submit" class="btn btn-sm bg-black text-white border-black hover:bg-gray-900 whitespace-nowrap">Confirmar receção</button>
+                                                                    </form>
+                                                                @endif
+                                                            @else
+                                                                <span class="text-xs text-gray-400">Concluída</span>
+                                                            @endif
+                                                        </td>
+                                                    @endif
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                {{-- Estado vazio quando não existe histórico de requisições para o livro --}}
+                <div class="alert">
+                    <span>Ainda não existe histórico de requisições para este livro.</span>
+                </div>
+            @endif
+        </div>
+        @endauth
     </div>
+
+    {{-- Script para fechar o popup de informação ao clicar em OK, fora do modal ou pressionar ESC --}}
+    @if (session('popup_info'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var popup = document.getElementById('livro-popup-info');
+                var closeBtn = document.getElementById('livro-popup-info-close');
+
+                if (!popup || !closeBtn) {
+                    return;
+                }
+
+                function closePopup() {
+                    popup.remove();
+                }
+
+                closeBtn.addEventListener('click', closePopup);
+
+                popup.addEventListener('click', function (event) {
+                    if (event.target === popup) {
+                        closePopup();
+                    }
+                });
+
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        closePopup();
+                    }
+                });
+            });
+        </script>
+    @endif
+
+    {{-- Script para fechar o popup de sucesso ao clicar em OK, fora do modal ou pressionar ESC --}}
+    @if (session('popup_success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var popup = document.getElementById('livro-popup-success');
+                var closeBtn = document.getElementById('livro-popup-success-close');
+
+                if (!popup || !closeBtn) {
+                    return;
+                }
+
+                function closePopup() {
+                    popup.remove();
+                }
+
+                closeBtn.addEventListener('click', closePopup);
+
+                popup.addEventListener('click', function (event) {
+                    if (event.target === popup) {
+                        closePopup();
+                    }
+                });
+
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        closePopup();
+                    }
+                });
+            });
+        </script>
+    @endif
 </x-app-layout>
+
+
+

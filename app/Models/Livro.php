@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -26,4 +25,13 @@ class Livro extends Model
     {
         return $this->belongsToMany(Autor::class);
     }
+
+    // Relacao 1:N com requisicoes feitas para este livro.
+    public function requisicoes()
+    {
+        return $this->hasMany(Requisicao::class);
+    }
 }
+
+
+

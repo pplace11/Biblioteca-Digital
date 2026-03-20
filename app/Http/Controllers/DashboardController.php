@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Livro;
@@ -7,7 +6,7 @@ use App\Models\Autor;
 use App\Models\Editora;
 use DB;
 
-// Controller que centraliza os indicadores exibidos no dashboard.
+// Controlador que centraliza os indicadores exibidos no painel.
 class DashboardController extends Controller
 {
     // Monta as metricas, rankings e listas para a pagina inicial autenticada.
@@ -38,3 +37,6 @@ class DashboardController extends Controller
         ));
     }
 }
+
+
+

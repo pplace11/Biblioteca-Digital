@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+// Modelo que representa uma editora com os seus livros publicados.
 class Editora extends Model
 {
     protected $fillable = [
@@ -17,4 +17,7 @@ class Editora extends Model
         return $this->hasMany(Livro::class);
     }
 }
+
+
+
 

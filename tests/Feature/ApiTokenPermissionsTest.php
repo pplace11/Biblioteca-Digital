@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 use Illuminate\Support\Str;
 use Laravel\Jetstream\Features;
@@ -36,3 +38,4 @@ test('api token permissions can be updated', function () {
 })->skip(function () {
     return ! Features::hasApiFeatures();
 }, 'API support is not enabled.');
+

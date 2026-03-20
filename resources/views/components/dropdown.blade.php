@@ -11,6 +11,9 @@ $alignmentClasses = match ($align) {
 $width = match ($width) {
     '48' => 'w-48',
     '60' => 'w-60',
+    '72' => 'w-72',
+    '80' => 'w-80',
+    '96' => 'w-96',
     default => 'w-48',
 };
 @endphp
@@ -35,3 +38,6 @@ $width = match ($width) {
         </div>
     </div>
 </div>
+
+
+

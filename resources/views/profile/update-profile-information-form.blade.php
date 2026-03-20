@@ -1,17 +1,17 @@
 <x-form-section submit="updateProfileInformation">
     <x-slot name="title">
-        {{ __('Profile Information') }}
+        Informações do Perfil
     </x-slot>
 
     <x-slot name="description">
-        {{ __('Update your account\'s profile information and email address.') }}
+        Atualize as informações do seu perfil e o seu endereço de email.
     </x-slot>
 
     <x-slot name="form">
-        <!-- Profile Photo -->
+        <!-- Fotografia de Perfil -->
         @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
             <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
-                <!-- Profile Photo File Input -->
+                <!-- Input de Ficheiro para Fotografia de Perfil -->
                 <input type="file" id="photo" class="hidden"
                             wire:model.live="photo"
                             x-ref="photo"
@@ -24,27 +24,31 @@
                                     reader.readAsDataURL($refs.photo.files[0]);
                             " />
 
-                <x-label for="photo" value="{{ __('Photo') }}" />
+                <x-label for="photo" value="Fotografia" />
 
-                <!-- Current Profile Photo -->
+                <!-- Fotografia de Perfil Atual -->
                 <div class="mt-2" x-show="! photoPreview">
-                    <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="rounded-full size-20 object-cover">
+                    <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="rounded-full size-20 object-cover border-2 border-slate-200">
                 </div>
 
-                <!-- New Profile Photo Preview -->
+                <!-- Pré-visualização da Nova Fotografia de Perfil -->
                 <div class="mt-2" x-show="photoPreview" style="display: none;">
-                    <span class="block rounded-full size-20 bg-cover bg-no-repeat bg-center"
+                    <span class="block rounded-full size-20 bg-cover bg-no-repeat bg-center border-2 border-slate-200"
                           x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
                     </span>
                 </div>
 
-                <x-secondary-button class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
-                    {{ __('Select A New Photo') }}
+                <p class="text-xs text-slate-500 mt-2" x-show="photoName" style="display: none;">
+                    Nova imagem: <span class="font-medium" x-text="photoName"></span>
+                </p>
+
+                <x-secondary-button class="mt-3 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
+                    Selecionar nova fotografia
                 </x-secondary-button>
 
                 @if ($this->user->profile_photo_path)
-                    <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
-                        {{ __('Remove Photo') }}
+                    <x-secondary-button type="button" class="mt-3" wire:click="deleteProfilePhoto">
+                        Remover fotografia
                     </x-secondary-button>
                 @endif
 
@@ -52,9 +56,9 @@
             </div>
         @endif
 
-        <!-- Name -->
+        <!-- Nome -->
         <div class="col-span-6 sm:col-span-4">
-            <x-label for="name" value="{{ __('Name') }}" />
+            <x-label for="name" value="Nome" />
             <x-input id="name" type="text" class="mt-1 block w-full" wire:model="state.name" required autocomplete="name" />
             <x-input-error for="name" class="mt-2" />
         </div>
@@ -67,29 +71,46 @@
 
             @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && ! $this->user->hasVerifiedEmail())
                 <p class="text-sm mt-2">
-                    {{ __('Your email address is unverified.') }}
+                    O seu endereço de email não está verificado.
 
-                    <button type="button" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" wire:click.prevent="sendEmailVerification">
-                        {{ __('Click here to re-send the verification email.') }}
+                    <button type="button" class="underline text-sm text-slate-600 hover:text-slate-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500" wire:click.prevent="sendEmailVerification">
+                        Clique aqui para reenviar o email de verificação.
                     </button>
                 </p>
 
                 @if ($this->verificationLinkSent)
-                    <p class="mt-2 font-medium text-sm text-green-600">
-                        {{ __('A new verification link has been sent to your email address.') }}
+                    <p class="mt-2 font-medium text-sm text-emerald-600">
+                        Um novo link de verificação foi enviado para o seu endereço de email.
                     </p>
                 @endif
             @endif
+        </div>
+
+        <!-- Numero de Leitor (apenas leitura) -->
+        <div class="col-span-6 sm:col-span-4">
+            <x-label for="numero_leitor" value="N.º de Leitor" />
+            <x-input
+                id="numero_leitor"
+                type="text"
+                class="mt-1 block w-full bg-slate-50 text-slate-600"
+                value="{{ $this->user->numero_leitor ?? '-' }}"
+                readonly
+                disabled
+            />
+            <p class="mt-2 text-xs text-slate-500">Este número é atribuído automaticamente e não pode ser alterado.</p>
         </div>
     </x-slot>
 
     <x-slot name="actions">
         <x-action-message class="me-3" on="saved">
-            {{ __('Saved.') }}
+            Guardado.
         </x-action-message>
 
         <x-button wire:loading.attr="disabled" wire:target="photo">
-            {{ __('Save') }}
+            Guardar
         </x-button>
     </x-slot>
 </x-form-section>
+
+
+

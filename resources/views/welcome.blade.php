@@ -24,71 +24,69 @@
 </head>
 
 <body class="bg-base-200">
-    {{-- Barra de navegação principal com acesso a login e registo --}}
-    <div class="navbar bg-base-100 shadow">
-        <div class="flex-1">
-            <a href="{{ url('/') }}">
-                <x-application-logo class="block h-12 w-auto" />
-            </a>
-        </div>
-        <div class="flex gap-2">
-            <a href="{{ route('login') }}" class="btn btn-primary">
-                Entrar
-            </a>
-            <a href="{{ route('register') }}" class="btn btn-secondary">
-                Registrar
-            </a>
-        </div>
-    </div>
+    {{-- Navbar da home no mesmo estilo da navegação do cidadão --}}
+    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="h-16 grid grid-cols-[auto_1fr_auto] items-center gap-6">
+                <div class="flex items-center">
+                    <a href="{{ url('/') }}" class="shrink-0">
+                        <x-application-mark class="block h-9 w-auto" />
+                    </a>
+                </div>
 
-    {{-- Seção hero de apresentação do sistema --}}
-    <div class="hero min-h-[60vh]">
+                <div class="hidden sm:flex items-center justify-center gap-2">
+                        <a href="{{ route('livros.index') }}" class="px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition">
+                            Livros
+                        </a>
+                        @auth
+                            <a href="{{ route('requisicoes.index') }}" class="px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition">
+                                Requisição
+                            </a>
+                        @endauth
+                        <a href="{{ route('autores.index') }}" class="px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition">
+                            Autores
+                        </a>
+                        <a href="{{ route('editoras.index') }}" class="px-3 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition">
+                            Editoras
+                        </a>
+                </div>
+
+                <div class="flex items-center justify-end gap-2">
+                    <a href="{{ route('login') }}" class="px-3 py-2 rounded-xl text-sm font-semibold bg-black text-white border border-black hover:bg-neutral-800 transition">
+                        Entrar
+                    </a>
+                    <a href="{{ route('register') }}" class="px-3 py-2 rounded-xl text-sm font-semibold bg-white text-black border border-black hover:bg-gray-100 transition">
+                        Registar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {{-- Seção hero de apresentação da biblioteca digital --}}
+    <div id="inicio" class="hero min-h-[60vh]">
         <div class="hero-content text-center">
-            <div>
-                <h1 class="text-5xl font-bold">
-                    Sistema de Biblioteca
+            <div class="max-w-3xl">
+                <p class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Biblioteca Digital</p>
+                <h1 class="text-5xl font-bold mt-3">
+                    O seu acervo literário, disponível em qualquer momento
                 </h1>
                 <p class="py-6 text-lg">
-                    Gestão moderna de livros, autores e editoras.
+                    Descubra livros, conheça autores, acompanhe editoras e faça requisições online com uma experiência simples, rápida
+                    e moderna.
                 </p>
-                <a href="{{ route('login') }}" class="btn btn-primary btn-lg">
+                <a href="{{ route('login') }}" class="btn btn-lg bg-black text-white border-black hover:bg-gray-900 hover:text-white">
                     Entrar
                 </a>
-                <a href="{{ route('register') }}" class="btn btn-secondary btn-lg">
-                Registrar
+                <a href="{{ route('register') }}" class="btn btn-lg btn-outline">
+                    Registar
                 </a>
-            </div>
-        </div>
-    </div>
-
-    {{-- Bloco de estatísticas gerais da biblioteca --}}
-    <div class="p-10">
-        <h2 class="text-3xl font-bold text-center mb-8">
-            Estatísticas da Biblioteca
-        </h2>
-        <div class="grid grid-cols-3 gap-6">
-            {{-- Card de total de livros --}}
-            <div class="stat bg-base-100 shadow">
-                <div class="stat-title">Livros</div>
-                <div class="stat-value">{{ $totalLivros }}</div>
-            </div>
-
-            {{-- Card de total de autores --}}
-            <div class="stat bg-base-100 shadow">
-                <div class="stat-title">Autores</div>
-                <div class="stat-value">{{ $totalAutores }}</div>
-            </div>
-
-            {{-- Card de total de editoras --}}
-            <div class="stat bg-base-100 shadow">
-                <div class="stat-title">Editoras</div>
-                <div class="stat-value">{{ $totalEditoras }}</div>
             </div>
         </div>
     </div>
 
     {{-- Grade com livros em destaque --}}
-    <div class="p-10">
+    <div id="destaques" class="p-10">
         <h2 class="text-3xl font-bold text-center mb-8">
             Livros em Destaque
         </h2>
@@ -115,10 +113,19 @@
                             @endforeach
                         </p>
 
-                        {{-- Preço do livro --}}
-                        <p class="font-bold">
-                            € {{ $livro->preco }}
+                        {{-- Preço do livro formatado em euros --}}
+                        <p class="text-base font-semibold text-gray-900">
+                            @if (!is_null($livro->preco))
+                                {{ number_format((float) $livro->preco, 2, ',', '.') }} &euro;
+                            @else
+                                -
+                            @endif
                         </p>
+
+                        {{-- Botão para requisitar direcionando ao login --}}
+                        <a href="{{ route('login') }}" class="btn btn-sm mt-1 bg-black text-white border-black hover:bg-gray-900 hover:text-white">
+                            Requisitar
+                        </a>
                     </div>
                 </div>
             @endforeach
@@ -128,8 +135,11 @@
     {{-- Rodapé institucional da página inicial --}}
     <footer class="footer footer-center p-6 bg-base-100">
         <p>
-            Sistema Biblioteca © {{ date('Y') }}
+            Biblioteca Digital © {{ date('Y') }}
         </p>
     </footer>
 </body>
 </html>
+
+
+

@@ -2,6 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Componentes reutilizáveis para manter a aparência dos botões consistente no projeto. */
+@layer components {
+    /* Estilo base dos botões: visual sólido, cantos arredondados e transição suave. */
+    .btn {
+        @apply rounded-2xl border border-black bg-black px-5 text-white shadow-none transition-colors duration-200;
+    }
+
+    /* Hover padrão para reforçar contraste sem mudar a identidade visual. */
+    .btn:hover {
+        @apply border-black bg-gray-900 text-white;
+    }
+
+    /* Foco acessível para navegação por teclado. */
+    .btn:focus-visible {
+        @apply outline-none ring-2 ring-black ring-offset-2;
+    }
+
+    /* Variantes outline/ghost usam base clara mantendo legibilidade. */
+    .btn.btn-outline,
+    .btn.btn-ghost {
+        @apply bg-white text-black;
+    }
+
+    /* Hover específico para variantes claras. */
+    .btn.btn-outline:hover,
+    .btn.btn-ghost:hover {
+        @apply bg-gray-100 text-black;
+    }
+
+    /* Normaliza variantes semânticas do DaisyUI para o mesmo tema monocromático. */
+    .btn.btn-primary,
+    .btn.btn-secondary,
+    .btn.btn-accent,
+    .btn.btn-info,
+    .btn.btn-success,
+    .btn.btn-warning,
+    .btn.btn-error {
+        @apply border-black bg-black text-white;
+    }
+
+    /* Hover compartilhado entre todas as variantes semânticas. */
+    .btn.btn-primary:hover,
+    .btn.btn-secondary:hover,
+    .btn.btn-accent:hover,
+    .btn.btn-info:hover,
+    .btn.btn-success:hover,
+    .btn.btn-warning:hover,
+    .btn.btn-error:hover {
+        @apply border-black bg-gray-900 text-white;
+    }
+}
+
+/* Esconde elementos Alpine até o framework inicializar para evitar flicker. */
 [x-cloak] {
     display: none;
 }
+
+
+

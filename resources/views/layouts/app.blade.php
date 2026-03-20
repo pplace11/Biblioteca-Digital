@@ -14,7 +14,7 @@
             $appName = empty($configuredName) || $configuredName === 'Laravel' ? 'Biblioteca' : $configuredName;
             $routeName = request()->route()?->getName();
             $routeTitles = [
-                'dashboard' => 'Dashboard',
+                'dashboard' => 'Painel',
                 'livros.index' => 'Livros',
                 'livros.create' => 'Novo Livro',
                 'livros.edit' => 'Editar Livro',
@@ -34,7 +34,7 @@
 
         {{-- Favicon da aplicação --}}
         <link rel="icon" type="image/png" href="{{ asset('images/logo/inovcorp.png') }}">
-        <!-- Fonts -->
+        <!-- Fontes -->
 
         {{-- Assets de estilo/scripts via CDN --}}
         <!-- Scripts -->
@@ -42,7 +42,7 @@
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
         {{-- Estilos necessários do Livewire --}}
-        <!-- Styles -->
+        <!-- Estilos -->
         @livewireStyles
     </head>
 
@@ -52,12 +52,12 @@
         <x-banner />
 
         {{-- Container raiz da página --}}
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-gray-100 flex flex-col">
             {{-- Menu de navegação principal --}}
             @livewire('navigation-menu')
 
             {{-- Cabeçalho opcional de página (quando o slot $header for definido) --}}
-            <!-- Page Heading -->
+            <!-- Cabecalho da Pagina -->
             @if (isset($header))
                 <header class="bg-white shadow">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -67,10 +67,14 @@
             @endif
 
             {{-- Conteúdo principal da página injetado via slot --}}
-            <!-- Page Content -->
-            <main>
+            <!-- Conteudo da Pagina -->
+            <main class="pb-24 sm:pb-0 flex-1">
                 {{ $slot }}
             </main>
+
+            <footer class="footer footer-center p-6 bg-base-100 border-t border-gray-100">
+                <p>Biblioteca Digital © {{ date('Y') }}</p>
+            </footer>
         </div>
 
         {{-- Pilha para modais empurrados por componentes/visões filhas --}}
@@ -80,3 +84,6 @@
         @livewireScripts
     </body>
 </html>
+
+
+

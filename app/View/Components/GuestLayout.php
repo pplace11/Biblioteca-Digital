@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\View\Components;
 
 use Illuminate\View\Component;
@@ -15,3 +17,6 @@ class GuestLayout extends Component
         return view('layouts.guest');
     }
 }
+
+
+

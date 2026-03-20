@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Actions\Fortify;
 
 use App\Models\User;
@@ -33,3 +35,6 @@ class UpdateUserPassword implements UpdatesUserPasswords
         ])->save();
     }
 }
+
+
+

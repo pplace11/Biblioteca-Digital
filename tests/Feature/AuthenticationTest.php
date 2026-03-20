@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 
 test('login screen can be rendered', function () {
@@ -30,3 +32,4 @@ test('users cannot authenticate with invalid password', function () {
 
     $this->assertGuest();
 });
+

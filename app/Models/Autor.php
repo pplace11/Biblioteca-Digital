@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+// Modelo que representa um autor e os seus livros publicados na biblioteca.
 class Autor extends Model
 {
     protected $fillable = [
@@ -18,4 +18,7 @@ class Autor extends Model
         return $this->belongsToMany(Livro::class);
     }
 }
+
+
+
 

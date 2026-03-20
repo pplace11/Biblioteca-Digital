@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Http\Livewire\DeleteUserForm;
@@ -29,3 +31,4 @@ test('correct password must be provided before account can be deleted', function
 })->skip(function () {
     return ! Features::hasAccountDeletionFeatures();
 }, 'Account deletion is not enabled.');
+

@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Http\Livewire\TwoFactorAuthenticationForm;
@@ -56,3 +58,4 @@ test('two factor authentication can be disabled', function () {
 })->skip(function () {
     return ! Features::canManageTwoFactorAuthentication();
 }, 'Two factor authentication is not enabled.');
+

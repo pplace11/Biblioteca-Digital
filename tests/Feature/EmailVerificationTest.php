@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
@@ -58,3 +60,4 @@ test('email can not verified with invalid hash', function () {
 })->skip(function () {
     return ! Features::enabled(Features::emailVerification());
 }, 'Email verification not enabled.');
+

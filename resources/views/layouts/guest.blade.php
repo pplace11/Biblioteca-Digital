@@ -33,7 +33,7 @@
         <link rel="icon" type="image/png" href="{{ asset('images/logo/inovcorp.png') }}">
 
         {{-- Pré-conexão e carregamento da fonte usada na interface --}}
-        <!-- Fonts -->
+        <!-- Fontes -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
@@ -42,18 +42,25 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         {{-- Estilos necessários do Livewire --}}
-        <!-- Styles -->
+        <!-- Estilos -->
         @livewireStyles
     </head>
 
     {{-- Layout para páginas públicas/guest (login, registo, recuperação de senha, etc.) --}}
     <body>
         {{-- Slot principal onde o conteúdo da view convidada é renderizado --}}
-        <div class="font-sans text-gray-900 antialiased">
+        <div class="font-sans text-gray-900 antialiased min-h-screen flex flex-col">
             {{ $slot }}
+
+            <footer class="footer footer-center p-6 bg-base-100 border-t border-gray-100 mt-auto">
+                <p>Biblioteca Digital © {{ date('Y') }}</p>
+            </footer>
         </div>
 
         {{-- Scripts necessários do Livewire --}}
         @livewireScripts
     </body>
 </html>
+
+
+

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Editora;
@@ -7,7 +6,7 @@ use App\Models\Livro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-// Controller responsavel pelas operacoes CRUD de editoras.
+// Controlador responsavel pelas operacoes CRUD de editoras.
 class EditoraController extends Controller
 {
     // Lista editoras com pesquisa e ordenacao por nome.
@@ -79,7 +78,7 @@ class EditoraController extends Controller
         }
 
         $editora->update($data);
-        return redirect()->route('editoras.index');
+        return redirect()->route('editoras.show', $editora->id);
     }
 
     // Remove livros e vinculos relacionados antes de excluir a editora.
@@ -97,3 +96,6 @@ class EditoraController extends Controller
         return redirect()->route('editoras.index');
     }
 }
+
+
+

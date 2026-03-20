@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Models\User;
 use Laravel\Jetstream\Features;
 use Laravel\Jetstream\Http\Livewire\ApiTokenManager;
@@ -30,3 +32,4 @@ test('api tokens can be created', function () {
 })->skip(function () {
     return ! Features::hasApiFeatures();
 }, 'API support is not enabled.');
+

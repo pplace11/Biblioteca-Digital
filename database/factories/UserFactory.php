@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace Database\Factories;
 
 use App\Models\Team;
@@ -70,3 +72,6 @@ class UserFactory extends Factory
         );
     }
 }
+
+
+

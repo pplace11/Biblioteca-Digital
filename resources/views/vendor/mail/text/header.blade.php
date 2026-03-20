@@ -1,0 +1,5 @@
+{{ config('app.name') }}
+{{ $url }}
+
+
+
